@@ -1,26 +1,32 @@
 import os
 from dotenv import load_dotenv
-from langchain.chains import create_retrieval_chain
-from langchain.chains.combine_documents import create_stuff_documents_chain
+
+from langchain.chains import ConversationalRetrievalChain
+from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 
-load_dotenv()
+load_dotenv(override=True)
 
 def create_llm():
     return ChatOpenAI(
         base_url=os.getenv("OPENAI_BASE_URL"),
         api_key=os.getenv("OPENAI_API_KEY"),
         model=os.getenv("MODEL_NAME"),
-        temperature=0.7,
-        default_headers={"App-Code": "fresher"},
-        extra_body= {
-            "service": "test_rag_for_langchain_app",
-            "chat_template_kwargs": {
-                "enable_thinking": False
-                }
-            },
         )
+    # return ChatOpenAI(
+    #     base_url=os.getenv("OPENAI_BASE_URL"),
+    #     api_key=os.getenv("OPENAI_API_KEY"),
+    #     model=os.getenv("MODEL_NAME"),
+    #     temperature=0.7,
+    #     default_headers={"App-Code": "fresher"},
+    #     extra_body= {
+    #         "service": "test_rag_for_langchain_app",
+    #         "chat_template_kwargs": {
+    #             "enable_thinking": False
+    #             }
+    #         },
+    #     )
 
 
 def create_prompt_template() -> PromptTemplate:
@@ -36,7 +42,7 @@ def create_prompt_template() -> PromptTemplate:
     4. Answer in natural and easy-to-understand Vietnamese.
     
     Question: 
-    {input}
+    {question}
     
     Answer:"""
     
@@ -47,5 +53,12 @@ def create_qa_chain(llm: ChatOpenAI, retriever):
         return None
 
     prompt = create_prompt_template()
-    combine_docs_chain = create_stuff_documents_chain(llm, prompt)
-    return create_retrieval_chain(retriever, combine_docs_chain)
+    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+    chain = ConversationalRetrievalChain.from_llm(
+        llm=llm,
+        retriever=retriever,
+        memory=memory,
+        verbose = True,
+        combine_docs_chain_kwargs={"prompt": prompt}
+    )
+    return chain

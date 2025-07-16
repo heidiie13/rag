@@ -7,10 +7,22 @@ class RAGPipeline:
       self.llm = create_llm()
       self.qa_chain = create_qa_chain(self.llm, self.retriever)
       
-   def get_answer(self, query):
-      answer = self.qa_chain.invoke({"input": query})
-      return answer.get("answer","")
-   
-   def get_answer_stream(self, query):
-      for chunk in self.qa_chain.stream({"input": query}):
-         yield chunk.get("answer","")
+   def get_answer(self, query, context=None):
+      payload = {"question": query}
+      if context:
+         payload["chat_history"] = context
+      answer = self.qa_chain.invoke(payload)
+
+      if isinstance(answer, dict):
+         return answer.get("answer","")
+      return answer
+
+   def get_answer_stream(self, query, context=None):
+      payload = {"question": query}
+      if context:
+         payload["chat_history"] = context
+      for chunk in self.qa_chain.stream(payload):
+         if isinstance(chunk, dict):
+            yield chunk.get("answer","")
+         else:
+            yield chunk

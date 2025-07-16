@@ -24,12 +24,16 @@ app.add_middleware(
 )
 
 class QueryRequest(BaseModel):
-   query: str
+    question: str
+    chat_history: list = []
    
 @app.post("/chat/stream")
-async def get_answer_stream(question: QueryRequest):
-   return StreamingResponse(rag_pipeline.get_answer_stream(question.query), media_type="text/event-stream")
+def get_answer_stream(request: QueryRequest):
+    return StreamingResponse(
+        rag_pipeline.get_answer_stream(request.question, request.chat_history),
+        media_type="text/event-stream"
+    )
 
 @app.post("/chat")
-async def get_answer(question: QueryRequest):
-   return rag_pipeline.get_answer(question.query)
+def get_answer(request: QueryRequest):
+    return rag_pipeline.get_answer(request.question, request.chat_history)
