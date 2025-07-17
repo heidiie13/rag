@@ -4,7 +4,7 @@ from langchain.schema import Document
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_qdrant import QdrantVectorStore
 
-def create_embeddings(model_name: str = "intfloat/multilingual-e5-small") -> HuggingFaceEmbeddings:
+def create_embeddings(model_name: str = "huyydangg/DEk21_hcmute_embedding") -> HuggingFaceEmbeddings:
     return HuggingFaceEmbeddings(
         model_name=model_name,
         model_kwargs={'device': 'cpu'},

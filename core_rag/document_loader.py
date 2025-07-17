@@ -22,7 +22,8 @@ def extract_meta(text: str) -> dict:
     return {"doc_type": doc_type, "number": number, "date": date, "title": title}
 
 def build_chapter_map(text: str) -> list[tuple]:
-    return [(m.start(), m.group(1)) for m in re.finditer(r"(Chương\s+[IVXLCDM\d]+)", text)]
+    pattern = re.compile(r"(Chương\s+[IVXLCDM\d]+)\s*(.*?)(?=\n\s*(Chương\s+\d+|Điều\s+\d+|$))", flags=re.S)
+    return [(m.start(), (m.group(1).strip(), m.group(2).strip())) for m in pattern.finditer(text)]
 
 def split_articles(text: str, doc_type: str) -> list[dict]:
     start = re.search(r"Điều\s+1\b", text)
@@ -36,15 +37,18 @@ def split_articles(text: str, doc_type: str) -> list[dict]:
     articles = []
     for m in matches:
         abs_pos = start.start() + m.start()
-        chapter = None
-        for ch_pos, ch in chapter_map:
+        chapter, chapter_title = None, None
+        for ch_pos, (ch_num, ch_desc) in chapter_map:
             if ch_pos <= abs_pos:
-                chapter = ch
+                chapter = ch_num
+                ch_desc = re.sub(r"^[\s\.\-–:\n]+|[\s\.\-–:\n]+$", "", ch_desc)
+                chapter_title = ch_desc
             else:
                 break
         articles.append({
             "article": m.group(1).strip(),
             "chapter": chapter,
+            "chapter_title": chapter_title,
             "content": m.group(2).strip()
         })
     return articles
@@ -56,6 +60,9 @@ def split_documents(text: str) -> list[Document]:
     docs = []
     for art in articles:
         header = f"{art['article']}, {meta['doc_type']} {meta['title']} số {meta['number']} {meta['date']}"
+        
+        if art["chapter"]:
+            header = f"{art['article']}, {art['chapter']} - {art['chapter_title']}, {meta['doc_type']} {meta['title']} số {meta['number']} {meta['date']}"
 
         full_content = f"{header}\n{art['content']}"
         docs.append(
@@ -64,6 +71,7 @@ def split_documents(text: str) -> list[Document]:
                 metadata={
                     "article": art["article"],
                     "chapter": art["chapter"],
+                    "chapter_title": art["chapter_title"],
                     "doc_type": meta["doc_type"],
                     "number": meta["number"],
                     "date": meta["date"],

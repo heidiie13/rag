@@ -8,15 +8,9 @@ sys.path.append(project_root)
 from core_rag.document_loader import load_and_split_docs_dir
 from core_rag.embedding import create_embeddings, create_vector_store
 
-load_dotenv()
+load_dotenv(override=True)
 
 import logging
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.StreamHandler()]
-)
 
 logger = logging.getLogger(__file__)
 
