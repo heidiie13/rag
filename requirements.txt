@@ -6,4 +6,6 @@ langchain-qdrant
 langchain-huggingface
 sentence-transformers
 
+pypdf
+
 fastapi[standard]

@@ -3,8 +3,8 @@ import requests
 
 API_BASE = "http://127.0.0.1:8000"
 
-st.set_page_config(page_title="RAG Chatbot", layout="centered")
-st.title("💬 RAG Chatbot")
+st.set_page_config(page_title="Legal Chatbot", layout="centered")
+st.title("💬 Legal Chatbot")
 
 with st.sidebar:
     st.header("🛠 Option")

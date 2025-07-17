@@ -1,14 +1,15 @@
+import os, sys
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-import os, sys
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
 
 from core_rag.rag_pipeline import RAGPipeline
-
 
 app = FastAPI()
 rag_pipeline = RAGPipeline()

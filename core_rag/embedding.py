@@ -24,6 +24,7 @@ def create_vector_store(documents: list[Document],
         collection_name=collection_name,
         prefer_grpc=True,
         url=os.getenv("QDRANT_URL"),
-        api_key=os.getenv("QDRANT_API_KEY")
+        api_key=os.getenv("QDRANT_API_KEY"),
+        force_recreate=True,
     )
     return vector_store
