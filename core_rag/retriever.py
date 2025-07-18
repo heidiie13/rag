@@ -1,5 +1,6 @@
 import os
 from langchain.retrievers import EnsembleRetriever
+from langchain.schema import BaseRetriever
 from langchain_community.retrievers import BM25Retriever
 from langchain_qdrant import QdrantVectorStore
 from core_rag.embedding import create_embeddings

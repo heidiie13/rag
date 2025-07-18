@@ -7,5 +7,6 @@ langchain-huggingface
 sentence-transformers
 
 pypdf
+rank_bm25
 
 fastapi[standard]

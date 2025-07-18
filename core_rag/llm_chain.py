@@ -11,16 +11,20 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 from langchain.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
+from pydantic import SecretStr
 
 load_dotenv(override=True)
 
 def create_llm():
-   if not os.getenv("OPENAI_BASE_URL") or not os.getenv("OPENAI_API_KEY"):
+   API_KEY = os.getenv("OPENAI_API_KEY")
+   BASE_URL = os.getenv("OPENAI_BASE_URL")
+   
+   if not API_KEY or not BASE_URL:
       raise ValueError("OPENAI_BASE_URL, OPENAI_API_KEY environment variables must be set")
 
    return ChatOpenAI(
-        base_url=os.getenv("OPENAI_BASE_URL"),
-        api_key=os.getenv("OPENAI_API_KEY"),
+        base_url=BASE_URL,
+        api_key=SecretStr(API_KEY),
         model=os.getenv("MODEL_NAME", "gpt-4o-mini"),
         temperature=0.7,
         default_headers={"App-Code": "fresher"},

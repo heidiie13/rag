@@ -1,7 +1,11 @@
 import streamlit as st
 import requests
+import os
+from dotenv import load_dotenv
 
-API_BASE = "http://127.0.0.1:8030"
+load_dotenv()
+
+API_BASE = os.getenv("API_BASE")
 
 st.set_page_config(page_title="Legal Chatbot", layout="centered")
 st.title("💬 Legal Chatbot")

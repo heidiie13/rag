@@ -8,7 +8,7 @@
    ```
 2. Start the API server:
    ```sh
-   fastapi run api/main.py --port 8030
+   fastapi run api/main.py --port <YOUR_PORT>
    ```
 3. Interact with the chatbot via the provided API endpoints.
    ```sh
