@@ -1,10 +1,12 @@
 from core_rag.llm_chain import create_llm, create_qa_chain
-from core_rag.retriever import load_retriever
+from core_rag.retriever import load_ensemble_retriever, load_retriever
 from langchain.callbacks.tracers import ConsoleCallbackHandler
 
 class RAGPipeline:
    def __init__(self):
-      self.retriever = load_retriever()
+      self.retriever = load_retriever(k=20)
+      # self.retriever = load_ensemble_retriever()
+
       self.llm = create_llm()
       self.qa_chain = create_qa_chain(self.llm, self.retriever)
       

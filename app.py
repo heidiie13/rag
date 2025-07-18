@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-API_BASE = "http://127.0.0.1:8000"
+API_BASE = "http://127.0.0.1:8030"
 
 st.set_page_config(page_title="Legal Chatbot", layout="centered")
 st.title("💬 Legal Chatbot")

@@ -17,47 +17,38 @@ load_dotenv(override=True)
 def create_llm():
    if not os.getenv("OPENAI_BASE_URL") or not os.getenv("OPENAI_API_KEY"):
       raise ValueError("OPENAI_BASE_URL, OPENAI_API_KEY environment variables must be set")
-   
+
    return ChatOpenAI(
         base_url=os.getenv("OPENAI_BASE_URL"),
         api_key=os.getenv("OPENAI_API_KEY"),
-        model=os.getenv("MODEL_NAME"),
+        model=os.getenv("MODEL_NAME", "gpt-4o-mini"),
+        temperature=0.7,
+        default_headers={"App-Code": "fresher"},
+        extra_body= {
+            "service": "test_rag_for_langchain_app",
+            "chat_template_kwargs": {
+                "enable_thinking": False
+                }
+            },
         )
-   
-   # return ChatOpenAI(
-   #      base_url=os.getenv("OPENAI_BASE_URL"),
-   #      api_key=os.getenv("OPENAI_API_KEY"),
-   #      model=os.getenv("MODEL_NAME", "gpt-4o-mini"),
-   #      temperature=0.7,
-   #      default_headers={"App-Code": "fresher"},
-   #      extra_body= {
-   #          "service": "test_rag_for_langchain_app",
-   #          "chat_template_kwargs": {
-   #              "enable_thinking": False
-   #              }
-   #          },
-   #      )
 
 def create_qa_system_prompt() -> ChatPromptTemplate:
-   qa_system_prompt = """You are a knowledgeable and reliable AI legal assistant specializing in matters of taxes, fees, and charges (Thuế - Phí - Lệ phí). Your task is to assist users by answering questions based on the legal information provided in the context below.
+   qa_system_prompt = """Bạn là một trợ lý AI pháp lý đáng tin cậy và am hiểu, chuyên về các vấn đề liên quan đến Thuế - Phí - Lệ phí. Nhiệm vụ của bạn là hỗ trợ người dùng bằng cách trả lời các câu hỏi dựa trên thông tin pháp lý được cung cấp dưới đây.
 
 <context>:
 {context}
 </context>
 
-RESPONSE GUIDELINES:
-1. Use only the information from the provided context to answer the question.
-2. Provide accurate, clear, and well-structured answers.
-3. ALWAYS respond in the same language as the question.
-4. Always cite relevant legal documents that support your answer, if such references appear in the context.
-5. If the context does not contain enough information to fully answer the question, summarize any partially relevant information, and clearly state what specific information is missing. Do not reject the question outright; instead, explain what additional details would be needed.
-6. Organize your response with the most important information first, including the effective date or issuance date of the legal document when available.
-7. Use an appropriate tone and formality based on the legal context.
-8. Avoid providing personal legal advice or speculating beyond the provided context.
+HƯỚNG DẪN TRẢ LỜI:
+1. Chỉ sử dụng thông tin từ ngữ cảnh được cung cấp để trả lời câu hỏi.
+2. Cung cấp câu trả lời chính xác, rõ ràng và có cấu trúc tốt.
+3. LUÔN trả lời bằng cùng ngôn ngữ với câu hỏi.
+4. Luôn trích dẫn các văn bản pháp lý liên quan hỗ trợ câu trả lời, nếu có trong ngữ cảnh (Không tự ý tạo ra hoặc giả định các tham chiếu pháp lý).
+5. Nếu ngữ cảnh không chứa đủ thông tin để trả lời đầy đủ câu hỏi, hãy tóm tắt các thông tin liên quan một phần và nêu rõ thông tin cụ thể nào còn thiếu. Không từ chối câu hỏi; thay vào đó, hãy giải thích những chi tiết bổ sung cần thiết.
+6. Tổ chức câu trả lời với thông tin quan trọng nhất trước, bao gồm ngày hiệu lực hoặc ngày ban hành của văn bản pháp lý (nếu có).
+7. Sử dụng giọng văn và mức độ trang trọng phù hợp với bối cảnh pháp lý.
+8. Tránh đưa ra lời khuyên pháp lý cá nhân hoặc suy đoán vượt quá ngữ cảnh được cung cấp.
 
-IMPORTANT:
-- Your answers must be **based strictly on the provided context**.
-- Do not invent or assume legal references; **only mention laws or resolutions if they appear in the context.**
 """
    return ChatPromptTemplate.from_messages([
         ("system", qa_system_prompt),
